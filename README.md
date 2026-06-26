@@ -14,7 +14,7 @@ Add the dependency to your project's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>ke.meliora</groupId>
+    <groupId>tech.meliora.mulika</groupId>
     <artifactId>mulika-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
