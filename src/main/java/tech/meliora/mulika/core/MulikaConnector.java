@@ -3,6 +3,7 @@ package tech.meliora.mulika.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,8 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 @Component
 public class MulikaConnector {
-    public static Map<String, ServiceStats> servicesMap = new ConcurrentHashMap<>();
+    @Getter
+    public Map<String, ServiceStats> servicesMap = new ConcurrentHashMap<>();
     private final String app;
     private final String module;
     private final Duration reportInterval;
@@ -49,7 +51,7 @@ public class MulikaConnector {
                 this::reportStats,
                 properties.getReportInterval()
         );
-        log.info("Mulika: Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0,3) + "*****");
+        log.info("Mulika: Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0, 3) + "*****");
 
     }
 
