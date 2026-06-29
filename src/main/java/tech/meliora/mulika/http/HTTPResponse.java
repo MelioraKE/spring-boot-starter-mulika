@@ -1,4 +1,4 @@
-package tech.meliora.mulika;
+package tech.meliora.mulika.http;
 
 /**
  *

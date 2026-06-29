@@ -1,4 +1,6 @@
-package tech.meliora.mulika;
+package tech.meliora.mulika.domain;
+
+import tech.meliora.mulika.domain.enumerations.ServiceType;
 
 public class MulikaServiceDTO {
     private ServiceType type;

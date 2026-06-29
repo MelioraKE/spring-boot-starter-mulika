@@ -1,4 +1,4 @@
-package tech.meliora.mulika;
+package tech.meliora.mulika.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
