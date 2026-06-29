@@ -4,15 +4,15 @@ package tech.meliora.mulika.http;
  *
  * @author kamochu
  */
-public class HTTPResponse {
+public class MulikaHTTPResponse {
 
     private int responseCode;
     private String body;
 
-    public HTTPResponse() {
+    public MulikaHTTPResponse() {
     }
 
-    public HTTPResponse(int responseCode, String body) {
+    public MulikaHTTPResponse(int responseCode, String body) {
         this.responseCode = responseCode;
         this.body = body;
     }

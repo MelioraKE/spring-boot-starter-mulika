@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 import tech.meliora.mulika.config.MulikaProperties;
 import tech.meliora.mulika.domain.ServiceStats;
 import tech.meliora.mulika.domain.enumerations.ServiceType;
-import tech.meliora.mulika.http.HTTPClient;
-import tech.meliora.mulika.http.HTTPResponse;
+import tech.meliora.mulika.http.MulikaHTTPClient;
+import tech.meliora.mulika.http.MulikaHTTPResponse;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +32,11 @@ public class MulikaConnector {
     private Thread mulikaThread;
 
     private final MulikaProperties properties;
+    private final MulikaHTTPClient httpClient;
 
-    public MulikaConnector(MulikaProperties properties) {
+    public MulikaConnector(MulikaProperties properties, MulikaHTTPClient httpClient) {
         this.properties = properties;
+        this.httpClient = httpClient;
     }
 
     @PostConstruct
@@ -95,7 +98,7 @@ public class MulikaConnector {
 
         serviceStats.addRequest(successful, transactionTime);
 
-        log.info("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}, map: {}", serviceName, successful, transactionTime, serviceStats, servicesMap);
+        log.info("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}", serviceName, successful, transactionTime, serviceStats);
     }
 
     private void reportStats() {
@@ -106,11 +109,11 @@ public class MulikaConnector {
             headers.put("Authorization", "Bearer " + mulikaAPIKey.trim());
             headers.put("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
-            HTTPResponse response = HTTPClient.send(mulikaUrl, jsonRequest, "POST", "application/json", headers, 5000, 120000);
+            MulikaHTTPResponse response = httpClient.send(mulikaUrl, jsonRequest, "POST", "application/json", headers, Duration.ofSeconds(30));
 
             log.info("mulika|" + this.app + "|" + this.module + "| successfully reported stats");
             log.debug("mulika|" + this.app + "|" + this.module + "|request :" + jsonRequest + "|response : " + response + "|stats sent");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             log.warn("mulika|" + this.app + "|" + this.module + ". Encountered exception", e);
         }
     }

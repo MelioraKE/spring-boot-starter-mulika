@@ -103,7 +103,7 @@ public class ServiceStats {
 
     @Override
     public String toString() {
-        return "MulikaServiceDTO{" +
+        return "ServiceStats{" +
                 "name='" + name + '\'' +
                 ", totalRequests=" + totalRequests +
                 ", successTotal=" + successTotal +
