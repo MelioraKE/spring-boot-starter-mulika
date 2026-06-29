@@ -54,13 +54,13 @@ public class MulikaConnector {
     }
 
     public void report(String serviceName, boolean successful, int transactionTime) {
-        log.info("Request to report service : {}, result : {}, transactionTime : {}", serviceName, successful, transactionTime);
+        log.debug("Request to report service : {}, result : {}, transactionTime : {}", serviceName, successful, transactionTime);
 
         ServiceStats serviceStats = servicesMap.computeIfAbsent(serviceName, n -> new ServiceStats(ServiceType.SERVICE, n, 0, 0, 0, 0, 0));
 
         serviceStats.addRequest(successful, transactionTime);
 
-        log.info("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}", serviceName, successful, transactionTime, serviceStats);
+        log.debug("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}", serviceName, successful, transactionTime, serviceStats);
     }
 
     private void reportStats() {
