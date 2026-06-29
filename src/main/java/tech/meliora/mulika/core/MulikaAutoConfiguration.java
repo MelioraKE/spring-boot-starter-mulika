@@ -25,7 +25,7 @@ public class MulikaAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public MonitoringAspect monitoringAspect(MulikaConnector mulikaConnector) {
-        log.info("mulika|starting mulika reporting service in the background...");
+        log.info("Mulika: Starting mulika reporting service in the background...");
         return new MonitoringAspect(mulikaConnector);
     }
 

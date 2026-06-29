@@ -49,7 +49,7 @@ public class MulikaConnector {
                 this::reportStats,
                 properties.getReportInterval()
         );
-        log.info("Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0,3) + "*****");
+        log.info("Mulika: Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0,3) + "*****");
 
     }
 
@@ -73,7 +73,7 @@ public class MulikaConnector {
 
             MulikaHTTPResponse response = httpClient.send(mulikaUrl, jsonRequest, "POST", "application/json", headers, Duration.ofSeconds(30));
 
-            log.info("mulika|" + this.app + "|" + this.module + "| successfully reported stats");
+            log.info("Mulika: Successfully reported stats for app: {} and module: {}", app, module);
             log.debug("mulika|" + this.app + "|" + this.module + "|request :" + jsonRequest + "|response : " + response + "|stats sent");
         } catch (IOException | InterruptedException e) {
             log.warn("mulika|" + this.app + "|" + this.module + ". Encountered exception", e);
