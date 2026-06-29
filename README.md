@@ -43,3 +43,21 @@ mulika:
   url: https://mulika.natujenge.ke
   api-key: YOUR-API-KEY
 ```
+
+## Usage
+- To monitor an API, simply add the __@Monitor__ annotation to the Rest Controller method.
+- The annotation requires that you pass the service name to it.
+```java
+@RestController
+public class HelloResource {
+
+    @Monitor(service = "hello")
+    @GetMapping("/api/hello")
+    public Map<String, String> hello () {
+        Map<String, String> helloMap = new HashMap<>();
+        helloMap.put("Hello", "World");
+        return helloMap;
+    }
+}
+
+```
