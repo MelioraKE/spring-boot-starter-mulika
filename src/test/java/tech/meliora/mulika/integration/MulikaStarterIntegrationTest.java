@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(
         classes = TestApplication.class,
         properties = {
+                "mulika.enabled=true",
                 "mulika.application=hello",
                 "mulika.module=hello",
                 "mulika.url=http://localhost:8080",
@@ -57,4 +58,5 @@ public class MulikaStarterIntegrationTest {
         assertEquals(0, stats.getSuccessTotal());
         assertEquals(0, stats.getRejectedMessages());
     }
+
 }

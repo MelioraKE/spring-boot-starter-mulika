@@ -14,12 +14,12 @@ import tech.meliora.mulika.http.MulikaHTTPResponse;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MulikaConnectorTest {
@@ -37,6 +37,7 @@ public class MulikaConnectorTest {
 
     @BeforeEach
     void setUp() {
+//        when(properties.isEnabled()).thenReturn(true);
         when(properties.getApplication()).thenReturn("TestApp");
         when(properties.getModule()).thenReturn("TestModule");
         when(properties.getApiKey()).thenReturn("secret");
@@ -153,4 +154,90 @@ public class MulikaConnectorTest {
     void shouldDestroyWhenNoScheduledTaskExists() {
         assertDoesNotThrow(() -> connector.destroy());
     }
+
+    @Test
+    void shouldNotScheduleTaskWhenConfigurationIsInvalid() {
+        // Given
+        when(properties.getApplication()).thenReturn(null);
+        when(properties.getModule()).thenReturn("TestModule");
+        when(properties.getUrl()).thenReturn("http://localhost");
+        when(properties.getApiKey()).thenReturn("secret");
+        when(properties.getReportInterval()).thenReturn(Duration.ofMinutes(1));
+
+        MulikaConnector connector =
+                new MulikaConnector(properties, httpClient, taskScheduler);
+
+        // When
+        connector.init();
+
+        // Then
+        verify(taskScheduler, never())
+                .scheduleWithFixedDelay(any(Runnable.class), any(Duration.class));
+    }
+
+    @Test
+    void shouldReturnMissingApplication() {
+        ReflectionTestUtils.setField(connector, "app", null);
+        ReflectionTestUtils.setField(connector, "module", "Module");
+        ReflectionTestUtils.setField(connector, "mulikaUrl", "http://localhost");
+        ReflectionTestUtils.setField(connector, "mulikaAPIKey", "secret");
+
+        assertEquals(
+                List.of("mulika.application"),
+                connector.missingProperties());
+    }
+    @Test
+    void shouldReturnMissingModule() {
+        ReflectionTestUtils.setField(connector, "app", "App");
+        ReflectionTestUtils.setField(connector, "module", null);
+        ReflectionTestUtils.setField(connector, "mulikaUrl", "http://localhost");
+        ReflectionTestUtils.setField(connector, "mulikaAPIKey", "secret");
+
+        assertEquals(
+                List.of("mulika.module"),
+                connector.missingProperties());
+    }
+
+    @Test
+    void shouldReturnMissingUrl() {
+        ReflectionTestUtils.setField(connector, "app", "App");
+        ReflectionTestUtils.setField(connector, "module", "Module");
+        ReflectionTestUtils.setField(connector, "mulikaUrl", null);
+        ReflectionTestUtils.setField(connector, "mulikaAPIKey", "secret");
+
+        assertEquals(
+                List.of("mulika.url"),
+                connector.missingProperties());
+    }
+
+    @Test
+    void shouldReturnMissingApiKey() {
+        ReflectionTestUtils.setField(connector, "app", "App");
+        ReflectionTestUtils.setField(connector, "module", "Module");
+        ReflectionTestUtils.setField(connector, "mulikaUrl", "http://localhost");
+        ReflectionTestUtils.setField(connector, "mulikaAPIKey", null);
+
+        assertEquals(
+                List.of("mulika.api-key"),
+                connector.missingProperties());
+    }
+
+    @Test
+    void shouldReturnNoMissingPropertiesWhenConfigurationIsComplete() {
+        ReflectionTestUtils.setField(connector, "app", "App");
+        ReflectionTestUtils.setField(connector, "module", "Module");
+        ReflectionTestUtils.setField(connector, "mulikaUrl", "http://localhost");
+        ReflectionTestUtils.setField(connector, "mulikaAPIKey", "secret");
+
+        assertTrue(connector.missingProperties().isEmpty());
+    }
+
+    @Test
+    void shouldCoverIsBlankBranches() {
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(connector, "isBlank", (String) null));
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(connector, "isBlank", ""));
+        assertTrue((Boolean) ReflectionTestUtils.invokeMethod(connector, "isBlank", "   "));
+        assertFalse((Boolean) ReflectionTestUtils.invokeMethod(connector, "isBlank", "value"));
+    }
+
 }

@@ -26,6 +26,7 @@ Add the following properties to your `application.properties` or `application.ym
 ### application.properties
 
 ```properties
+mulika.enabled=true
 mulika.application=<your-application-name>
 mulika.module=<your-module-name>
 mulika.report-interval=60s
@@ -37,6 +38,7 @@ mulika.api-key=YOUR-API-KEY
 
 ```yaml
 mulika:
+  enabled: true
   application: <your-application-name>
   module: <your-module-name>
   report-interval: 60s

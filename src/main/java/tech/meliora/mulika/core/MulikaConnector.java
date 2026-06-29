@@ -2,6 +2,7 @@ package tech.meliora.mulika.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class MulikaConnector {
     private final String app;
     private final String module;
     private final Duration reportInterval;
-    private final String mulikaUrl;
+    private String mulikaUrl;
     private final String mulikaAPIKey;
     private final MulikaProperties properties;
     private final MulikaHTTPClient httpClient;
@@ -45,14 +46,26 @@ public class MulikaConnector {
         app = this.properties.getApplication();
         module = this.properties.getModule();
         reportInterval = this.properties.getReportInterval();
-        mulikaUrl = this.properties.getUrl() + REPORT_PATH;
+        mulikaUrl = this.properties.getUrl();
         mulikaAPIKey = this.properties.getApiKey();
+    }
+
+    @PostConstruct
+    public void init() {
+        List<String> missingProperties = missingProperties();
+        if (!missingProperties.isEmpty()) {
+            log.warn("Mulika monitoring disabled. Missing properties: {}", missingProperties);
+            return;
+        }
+
+        mulikaUrl = this.mulikaUrl + REPORT_PATH;
+
         scheduledTask = this.taskScheduler.scheduleWithFixedDelay(
                 this::reportStats,
                 properties.getReportInterval()
         );
-        log.info("Mulika: Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0, 3) + "*****");
 
+        log.info("Mulika: Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0, 3) + "*****");
     }
 
     public void report(String serviceName, boolean successful, int transactionTime) {
@@ -107,12 +120,37 @@ public class MulikaConnector {
         return objectMapper.writeValueAsString(mapList);
     }
 
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    public List<String> missingProperties() {
+        List<String> missingProperties = new ArrayList<>();
+
+        if (isBlank(this.app)) {
+            missingProperties.add("mulika.application");
+        }
+
+        if (isBlank(this.module)) {
+            missingProperties.add("mulika.module");
+        }
+
+        if (isBlank(this.mulikaUrl)) {
+            missingProperties.add("mulika.url");
+        }
+
+        if (isBlank(this.mulikaAPIKey)) {
+            missingProperties.add("mulika.api-key");
+        }
+
+        return missingProperties;
+    }
+
     @PreDestroy
     public void destroy() {
         if (scheduledTask != null) {
             scheduledTask.cancel(true);
         }
     }
-
 }
  

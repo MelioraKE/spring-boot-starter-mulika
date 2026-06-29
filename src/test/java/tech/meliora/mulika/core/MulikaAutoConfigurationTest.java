@@ -15,6 +15,7 @@ public class MulikaAutoConfigurationTest {
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(MulikaAutoConfiguration.class))
             .withPropertyValues(
+                    "mulika.enabled=true",
                     "mulika.application=hello",
                     "mulika.module=hello",
                     "mulika.url=http://localhost:8080",
