@@ -15,8 +15,8 @@ Add the dependency to your project's `pom.xml`:
 ```xml
 <dependency>
     <groupId>tech.meliora.mulika</groupId>
-    <artifactId>mulika-starter</artifactId>
-    <version>1.0.0</version>
+    <artifactId>spring-boot-starter-mulika</artifactId>
+    <version>3.5.15</version> <!-- your spring boot version --> 
 </dependency>
 ```
 ## Configuration
@@ -37,9 +37,9 @@ mulika.api-key=YOUR-API-KEY
 
 ```yaml
 mulika:
-  application: starter
-  module: starter
-  report-interval: 60000
+  application: <your-application-name>
+  module: <your-module-name>
+  report-interval: <time in ms after which you will report to Mulika eg 60_000>
   url: https://mulika.natujenge.ke
   api-key: YOUR-API-KEY
 ```
