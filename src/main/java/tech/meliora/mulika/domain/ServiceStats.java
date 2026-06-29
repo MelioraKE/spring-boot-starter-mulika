@@ -1,7 +1,13 @@
 package tech.meliora.mulika.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import tech.meliora.mulika.domain.enumerations.ServiceType;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServiceStats {
     private ServiceType type;
 
@@ -17,72 +23,11 @@ public class ServiceStats {
 
     private int transactionTime;
 
-    public ServiceStats() {
-    }
-
-    public ServiceStats(ServiceType type, String name, long totalRequests, long successTotal, long rejectedMessages, int queueSize, int transactionTime) {
-        this.type = type;
-        this.name = name;
-        this.totalRequests = totalRequests;
-        this.successTotal = successTotal;
-        this.rejectedMessages = rejectedMessages;
-        this.queueSize = queueSize;
-        this.transactionTime = transactionTime;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getTotalRequests() {
-        return totalRequests;
-    }
-
-    public void setTotalRequests(long totalRequests) {
-        this.totalRequests = totalRequests;
-    }
-
-    public long getSuccessTotal() {
-        return successTotal;
-    }
-
-    public void setSuccessTotal(long successTotal) {
-        this.successTotal = successTotal;
-    }
-
-    public long getRejectedMessages() {
-        return rejectedMessages;
-    }
-
-    public void setRejectedMessages(long rejectedMessages) {
-        this.rejectedMessages = rejectedMessages;
-    }
-
-    public int getQueueSize() {
-        return queueSize;
-    }
-
-    public void setQueueSize(int queueSize) {
-        this.queueSize = queueSize;
-    }
-
-    public int getTransactionTime() {
-        return transactionTime;
-    }
-
     public int getAvgTransactionTime() {
         if (totalRequests == 0) {
             return 0;
         }
         return (int) (transactionTime / totalRequests);
-    }
-
-    public void setTransactionTime(int transactionTime) {
-        this.transactionTime = transactionTime;
     }
 
     public void addRequest(boolean successful, int transactionTime) {
