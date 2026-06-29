@@ -10,6 +10,11 @@ import tech.meliora.mulika.core.MulikaConnector;
 @Slf4j
 @Aspect
 public class MonitoringAspect {
+    private final MulikaConnector mulikaConnector;
+
+    public MonitoringAspect(MulikaConnector mulikaConnector) {
+        this.mulikaConnector = mulikaConnector;
+    }
 
     /**
      * Pointcut that matches all Web REST endpoints.
@@ -25,10 +30,10 @@ public class MonitoringAspect {
         String serviceName = monitor.service();
         try {
             Object result = joinPoint.proceed();
-            MulikaConnector.report(serviceName,true, (int) (System.currentTimeMillis() - startTime));
+            mulikaConnector.report(serviceName,true, (int) (System.currentTimeMillis() - startTime));
             return result;
         } catch (Exception e) {
-            MulikaConnector.report(serviceName, false, (int) (System.currentTimeMillis() - startTime));
+            mulikaConnector.report(serviceName, false, (int) (System.currentTimeMillis() - startTime));
             throw e;
         }
     }

@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import tech.meliora.mulika.aop.MonitoringAspect;
 import tech.meliora.mulika.config.MulikaProperties;
 import tech.meliora.mulika.http.MulikaHTTPClient;
@@ -13,6 +16,7 @@ import tech.meliora.mulika.http.MulikaHTTPClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
+@EnableScheduling
 @AutoConfiguration
 @EnableAspectJAutoProxy
 @Slf4j
@@ -20,9 +24,8 @@ import java.time.Duration;
 public class MulikaAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
-    public MonitoringAspect monitoringAspect() {
-        log.info("Starting Mulika ....");
-        return new MonitoringAspect();
+    public MonitoringAspect monitoringAspect(MulikaConnector mulikaConnector) {
+        return new MonitoringAspect(mulikaConnector);
     }
 
     @Bean
@@ -43,8 +46,17 @@ public class MulikaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MulikaConnector mulikaConnector(MulikaProperties mulikaProperties, MulikaHTTPClient httpClient) {
-        log.info("Starting Mulika connector thread ....");
-        return new MulikaConnector(mulikaProperties, httpClient);
+    public MulikaConnector mulikaConnector(MulikaProperties mulikaProperties, MulikaHTTPClient httpClient, TaskScheduler taskScheduler) {
+        return new MulikaConnector(mulikaProperties, httpClient, taskScheduler);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("mulika-");
+        scheduler.initialize();
+        return scheduler;
     }
 }

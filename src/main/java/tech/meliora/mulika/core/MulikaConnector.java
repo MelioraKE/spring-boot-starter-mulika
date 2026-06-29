@@ -2,9 +2,9 @@ package tech.meliora.mulika.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 import tech.meliora.mulika.config.MulikaProperties;
 import tech.meliora.mulika.domain.ServiceStats;
@@ -18,80 +18,42 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 @Slf4j
 @Component
 public class MulikaConnector {
-    public static Map<String, ServiceStats> servicesMap = new HashMap<>();
-    private String app;
-    private String module;
-    private Integer reportInterval = 60000;
-    private String mulikaUrl;
-    private String mulikaAPIKey;
-
-    private Thread mulikaThread;
-
+    public static Map<String, ServiceStats> servicesMap = new ConcurrentHashMap<>();
+    private final String app;
+    private final String module;
+    private final Duration reportInterval;
+    private final String mulikaUrl;
+    private final String mulikaAPIKey;
     private final MulikaProperties properties;
     private final MulikaHTTPClient httpClient;
+    private final TaskScheduler taskScheduler;
+    private ScheduledFuture<?> scheduledTask;
+    private static final String REPORT_PATH = "/api/statistics/report-list";
 
-    public MulikaConnector(MulikaProperties properties, MulikaHTTPClient httpClient) {
-        this.properties = properties;
+    public MulikaConnector(MulikaProperties properties, MulikaHTTPClient httpClient, TaskScheduler taskScheduler) {
         this.httpClient = httpClient;
+        this.properties = properties;
+        this.taskScheduler = taskScheduler;
+        app = this.properties.getApplication();
+        module = this.properties.getModule();
+        reportInterval = this.properties.getReportInterval();
+        mulikaUrl = this.properties.getUrl() + REPORT_PATH;
+        mulikaAPIKey = this.properties.getApiKey();
+        scheduledTask = this.taskScheduler.scheduleWithFixedDelay(
+                this::reportStats,
+                properties.getReportInterval()
+        );
+        log.info("Successfully initialized mulika properties: app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey.substring(0,3) + "*****");
+
     }
 
-    @PostConstruct
-    public void init() {
-        log.info("About to start stats push thread");
-
-        app = properties.getApplication();
-        module = properties.getModule();
-        reportInterval = properties.getReportInterval();
-        mulikaUrl = properties.getUrl();
-        mulikaAPIKey = properties.getApiKey();
-
-        mulikaThread = new Thread(() -> {
-            while (true) {
-                try {
-                    try {
-                        Thread.sleep(reportInterval);
-                    } catch (InterruptedException ex) {
-                        log.warn("Thread could not sleep. trying again", ex);
-                        Thread.sleep(reportInterval);
-                    }
-
-                    reportStats();
-
-                } catch (InterruptedException e) {
-                    log.error("received an interrupt signal", e);
-                    break;
-                } catch (Exception ex) {
-                    log.warn("Encountered exception. Proceeding", ex);
-                }
-            }
-        }, "mulika-thread");
-
-        log.info("Successfully initialized mulika thread");
-
-        mulikaThread.start();
-
-        // append last part
-        if (mulikaUrl != null) {
-            mulikaUrl += "/api/statistics/report-list";
-        }
-
-        log.info("Successfully started mulika thread. app = {}, module: {}, url = {}, apiKey = {}", app, module, mulikaUrl, mulikaAPIKey);
-    }
-
-    @PreDestroy
-    public void destroy() {
-        log.info("About to interrupt mulikaThread");
-
-        mulikaThread.interrupt();
-
-        log.info("Successfully interrupted mulikaThread");
-    }
-
-    public static void report(String serviceName, boolean successful, int transactionTime) {
+    public void report(String serviceName, boolean successful, int transactionTime) {
         log.info("Request to report service : {}, result : {}, transactionTime : {}", serviceName, successful, transactionTime);
 
         ServiceStats serviceStats = servicesMap.computeIfAbsent(serviceName, n -> new ServiceStats(ServiceType.SERVICE, n, 0, 0, 0, 0, 0));
@@ -143,6 +105,12 @@ public class MulikaConnector {
         return objectMapper.writeValueAsString(mapList);
     }
 
+    @PreDestroy
+    public void destroy() {
+        if (scheduledTask != null) {
+            scheduledTask.cancel(true);
+        }
+    }
 
 }
  

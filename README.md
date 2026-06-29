@@ -28,7 +28,7 @@ Add the following properties to your `application.properties` or `application.ym
 ```properties
 mulika.application=<your-application-name>
 mulika.module=<your-module-name>
-mulika.report-interval=<time in ms after which you will report to Mulika eg 60_000>
+mulika.report-interval=60s
 mulika.url=https://mulika.natujenge.ke
 mulika.api-key=YOUR-API-KEY
 ```
@@ -39,7 +39,7 @@ mulika.api-key=YOUR-API-KEY
 mulika:
   application: <your-application-name>
   module: <your-module-name>
-  report-interval: <time in ms after which you will report to Mulika eg 60_000>
+  report-interval: 60s
   url: https://mulika.natujenge.ke
   api-key: YOUR-API-KEY
 ```
