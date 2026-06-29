@@ -3,15 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>tech.meliora.mulika</groupId>
-  <artifactId>mulika-starter</artifactId>
+  <artifactId>spring-boot-starter-mulika</artifactId>
   <version>3.5.15</version>
   <packaging>jar</packaging>
 
-  <name>mulika-starter</name>
-  <url>http://maven.apache.org</url>
+  <name>spring-boot-starter-mulika</name>
+  <url>http://meliora.co.ke</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <lombok.version>1.18.46</lombok.version>
   </properties>
 
   <dependencies>
@@ -25,7 +26,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.46</version>
+      <version>${lombok.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -53,6 +54,23 @@
       <version>2.22.0</version>
       <scope>compile</scope>
     </dependency>
-
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.15.0</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
