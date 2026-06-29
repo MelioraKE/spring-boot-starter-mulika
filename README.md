@@ -43,4 +43,3 @@ mulika:
   url: https://mulika.natujenge.ke
   api-key: YOUR-API-KEY
 ```
-

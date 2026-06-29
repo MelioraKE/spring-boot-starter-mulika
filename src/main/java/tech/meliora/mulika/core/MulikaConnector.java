@@ -7,7 +7,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import tech.meliora.mulika.config.MulikaProperties;
-import tech.meliora.mulika.domain.MulikaServiceDTO;
+import tech.meliora.mulika.domain.ServiceStats;
 import tech.meliora.mulika.domain.enumerations.ServiceType;
 import tech.meliora.mulika.http.HTTPClient;
 import tech.meliora.mulika.http.HTTPResponse;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class MulikaConnector {
-    public static Map<String, MulikaServiceDTO> servicesMap = new HashMap<>();
+    public static Map<String, ServiceStats> servicesMap = new HashMap<>();
     private String app;
     private String module;
     private Integer reportInterval = 60000;
@@ -91,11 +91,11 @@ public class MulikaConnector {
     public static void report(String serviceName, boolean successful, int transactionTime) {
         log.info("Request to report service : {}, result : {}, transactionTime : {}", serviceName, successful, transactionTime);
 
-        MulikaServiceDTO mulikaServiceDTO = servicesMap.computeIfAbsent(serviceName, n -> new MulikaServiceDTO(ServiceType.SERVICE, n, 0, 0, 0, 0, 0));
+        ServiceStats serviceStats = servicesMap.computeIfAbsent(serviceName, n -> new ServiceStats(ServiceType.SERVICE, n, 0, 0, 0, 0, 0));
 
-        mulikaServiceDTO.addRequest(successful, transactionTime);
+        serviceStats.addRequest(successful, transactionTime);
 
-        log.info("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}, map: {}", serviceName, successful, transactionTime, mulikaServiceDTO, servicesMap);
+        log.info("Successfully reported: service : {}, result : {}, transactionTime : {}, service : {}, map: {}", serviceName, successful, transactionTime, serviceStats, servicesMap);
     }
 
     private void reportStats() {
@@ -118,7 +118,7 @@ public class MulikaConnector {
     private String getRequests() throws JsonProcessingException {
         List<Map<String, Object>> mapList = new ArrayList<>();
 
-        for (MulikaServiceDTO service : servicesMap.values()) {
+        for (ServiceStats service : servicesMap.values()) {
             Map<String, Object> requestMap = new HashMap<>();
             requestMap.put("id", service.getName());
             requestMap.put("name", service.getName());

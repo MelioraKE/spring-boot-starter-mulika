@@ -2,7 +2,7 @@ package tech.meliora.mulika.domain;
 
 import tech.meliora.mulika.domain.enumerations.ServiceType;
 
-public class MulikaServiceDTO {
+public class ServiceStats {
     private ServiceType type;
 
     private String name;
@@ -17,10 +17,10 @@ public class MulikaServiceDTO {
 
     private int transactionTime;
 
-    public MulikaServiceDTO() {
+    public ServiceStats() {
     }
 
-    public MulikaServiceDTO(ServiceType type, String name, long totalRequests, long successTotal, long rejectedMessages, int queueSize, int transactionTime) {
+    public ServiceStats(ServiceType type, String name, long totalRequests, long successTotal, long rejectedMessages, int queueSize, int transactionTime) {
         this.type = type;
         this.name = name;
         this.totalRequests = totalRequests;
