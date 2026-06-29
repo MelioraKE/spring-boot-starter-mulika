@@ -37,7 +37,6 @@ public class MulikaConnectorTest {
 
     @BeforeEach
     void setUp() {
-//        when(properties.isEnabled()).thenReturn(true);
         when(properties.getApplication()).thenReturn("TestApp");
         when(properties.getModule()).thenReturn("TestModule");
         when(properties.getApiKey()).thenReturn("secret");
