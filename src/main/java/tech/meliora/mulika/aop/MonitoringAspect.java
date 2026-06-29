@@ -1,9 +1,9 @@
 package tech.meliora.mulika.aop;
+
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import tech.meliora.mulika.annotations.Monitor;
 import tech.meliora.mulika.core.MulikaConnector;
 
@@ -22,7 +22,7 @@ public class MonitoringAspect {
         String serviceName = monitor.service();
         try {
             Object result = joinPoint.proceed();
-            mulikaConnector.report(serviceName,true, (int) (System.currentTimeMillis() - startTime));
+            mulikaConnector.report(serviceName, true, (int) (System.currentTimeMillis() - startTime));
             return result;
         } catch (Exception e) {
             mulikaConnector.report(serviceName, false, (int) (System.currentTimeMillis() - startTime));
