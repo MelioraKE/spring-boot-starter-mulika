@@ -17,6 +17,13 @@ public class ServiceStatsTest {
     }
 
     @Test
+    void shouldReturn0IfRequestSize0() {
+        ServiceStats stats = new ServiceStats();
+
+        assertEquals(0, stats.getAvgTransactionTime());
+    }
+
+    @Test
     void shouldReset() {
         ServiceStats stats = new ServiceStats();
         stats.addRequest(true, 100);
@@ -29,6 +36,5 @@ public class ServiceStatsTest {
         assertEquals(0, stats.getRejectedMessages());
         assertEquals(0, stats.getQueueSize());
         assertEquals(0, stats.getTransactionTime());
-
     }
 }

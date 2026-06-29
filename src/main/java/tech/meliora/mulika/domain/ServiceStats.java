@@ -45,18 +45,6 @@ public class ServiceStats {
         this.queueSize = 0;
         this.transactionTime = 0;
     }
-
-    @Override
-    public String toString() {
-        return "ServiceStats{" +
-                "name='" + name + '\'' +
-                ", totalRequests=" + totalRequests +
-                ", successTotal=" + successTotal +
-                ", rejectedMessages=" + rejectedMessages +
-                ", queueSize=" + queueSize +
-                ", transactionTime=" + transactionTime +
-                '}';
-    }
 }
 
  

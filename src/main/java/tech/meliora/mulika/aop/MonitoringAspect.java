@@ -16,15 +16,7 @@ public class MonitoringAspect {
         this.mulikaConnector = mulikaConnector;
     }
 
-    /**
-     * Pointcut that matches all Web REST endpoints.
-     */
-    @Pointcut("@annotation(monitor)")
-    public void webRestPointcut(Monitor monitor) {
-        // Method is empty as this is just a Pointcut, the implementations are in the advices.
-    }
-
-    @Around("webRestPointcut(monitor)")
+    @Around("@annotation(monitor)")
     public Object reportEndpoint(ProceedingJoinPoint joinPoint, Monitor monitor) throws Throwable {
         long startTime = System.currentTimeMillis();
         String serviceName = monitor.service();
